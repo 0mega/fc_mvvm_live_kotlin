@@ -8,32 +8,30 @@ import challengemvvm.fundingcircle.com.fcchallengemvvm.feature.datamodel.Auction
 import challengemvvm.fundingcircle.com.fcchallengemvvm.feature.datamodel.AuctionsRepositoryCallback
 import challengemvvm.fundingcircle.com.fcchallengemvvm.model.Auction
 import challengemvvm.fundingcircle.com.fcchallengemvvm.model.networkmodel.AuctionsEndPoint
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.Function3
 
 class AuctionsListViewModel(context: Application, val mDataModel : AuctionsListRepositoryInterface) : AndroidViewModel(context) {
 
-    private val mLoadingIndicatorSubject: BehaviorSubject<Boolean> = BehaviorSubject.create()
-
     val auctionList : MutableLiveData<List<Auction>> = MutableLiveData()
+    val loadingIndicator : MutableLiveData<Boolean> = MutableLiveData()
 
     fun liveAuctions(): LiveData<List<Auction>> = auctionList
 
     fun retrieveAuctions() {
+        loadingIndicator.value = true
         mDataModel.retrieveAuctions(object : AuctionsRepositoryCallback {
             override fun onAuctionsLoaded(auctions: AuctionsEndPoint) {
                 auctionList.value = auctions.items
-                System.out.println("Has observers: ${auctionList.hasActiveObservers()}")
                 auctionList.postValue(auctions.items)
+                loadingIndicator.value = false
             }
 
             override fun onError() {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
         })
+
     }
 
-    fun getLoadingIndicatorVisibility(): Observable<Boolean> {
-        return mLoadingIndicatorSubject
-    }
 }

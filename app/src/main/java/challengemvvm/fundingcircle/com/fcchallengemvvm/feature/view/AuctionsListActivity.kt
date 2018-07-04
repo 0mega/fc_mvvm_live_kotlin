@@ -2,14 +2,11 @@ package challengemvvm.fundingcircle.com.fcchallengemvvm.feature.view
 
 import android.arch.lifecycle.Observer
 
-import android.databinding.ObservableList
-import android.databinding.ViewDataBinding
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -20,14 +17,7 @@ import challengemvvm.fundingcircle.com.fcchallengemvvm.feature.adapter.AuctionsL
 import challengemvvm.fundingcircle.com.fcchallengemvvm.feature.viewmodel.AuctionsListViewModel
 import challengemvvm.fundingcircle.com.fcchallengemvvm.model.Auction
 import challengemvvm.fundingcircle.com.fcchallengemvvm.service.GsonFactory
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.content_main.*
-import java.util.ArrayList
-import android.databinding.adapters.TextViewBindingAdapter.setText
-import android.support.annotation.Nullable
-
 
 class AuctionsListActivity : AppCompatActivity(), AuctionsListAdapter.AuctionClickListener {
 
@@ -62,61 +52,34 @@ class AuctionsListActivity : AppCompatActivity(), AuctionsListAdapter.AuctionCli
         bind()
     }
 
-    override fun onPause() {
-        super.onPause()
-        unBind()
-    }
-
     private fun setupListAdapter() {
-        if (mViewModel != null) {
-            adapter = AuctionsListAdapter(this, this)
-            mRecyclerView.layoutManager = LinearLayoutManager(this)
-            mRecyclerView.adapter = adapter
-        } else {
-            Log.w("TAG", "ViewModel not initialized when attempting to set up adapter.")
-        }
+        adapter = AuctionsListAdapter(this, this)
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mRecyclerView.adapter = adapter
     }
 
     private fun bind() {
         // Create the observer which updates the UI.
-        val listAuctionObserver: Observer<List<Auction>> = Observer { it ->
+        val listAuctionObserver : Observer<List<Auction>> = Observer { it ->
             adapter.setAuctions(it ?: listOf())
             adapter.notifyDataSetChanged()
         }
 
+        val loadingIndicatorObserver : Observer<Boolean> = Observer { it ->
+            setLoadingIndicatorVisibility(it ?: true)
+        }
+
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         val liveAuctions = mViewModel.liveAuctions()
+        val loadingIndicator = mViewModel.loadingIndicator
         liveAuctions.observe(this, listAuctionObserver)
+        loadingIndicator.observe(this, loadingIndicatorObserver)
 
         mViewModel.retrieveAuctions()
     }
 
-    private fun unBind() {
-
-    }
-
     fun setLoadingIndicatorVisibility(isProgresBarVisible : Boolean) {
-        if(isProgresBarVisible) {
-            showProgress()
-        } else{
-            hideProgress()
-        }
-    }
-
-    fun showProgress() {
-        mProgressBar.visibility = VISIBLE
-    }
-
-     fun hideProgress() {
-        mProgressBar.visibility = GONE
-    }
-
-    fun showAuctions(auctions: List<Auction>) {
-        mAuctions = auctions
-        val adapter = AuctionsListAdapter(this, this)
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
-        mRecyclerView.adapter = adapter
-        adapter.setAuctions(auctions)
+        mProgressBar.visibility = if(isProgresBarVisible) VISIBLE else GONE
     }
 
     override fun onAuctionClicked(auction: Auction) {
