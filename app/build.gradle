@@ -64,9 +64,21 @@ dependencies {
     //Unit test
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.8.47'
+    testImplementation "android.arch.core:core-testing:1.1.1"
+    // Spek
+    testImplementation("org.jetbrains.spek:spek-api:1.1.5") {
+        exclude group: "org.jetbrains.kotlin"
+    }
+    testImplementation("org.jetbrains.spek:spek-junit-platform-engine:1.1.5") {
+        exclude group: "org.junit.platform"
+        exclude group: "org.jetbrains.kotlin"
+    }
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:1.2.30"
+    testImplementation "org.junit.platform:junit-platform-runner:1.0.0"
 
     //UI Test
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
 }

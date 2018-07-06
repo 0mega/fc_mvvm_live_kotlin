@@ -9,5 +9,5 @@ data class Auction(
         val id: String,
         val title: String,
         val rate: Float,
-        @SerializedName("risk_band") val riskBand: String) {
+        @SerializedName("risk_band") var riskBand: String) {
 }

@@ -7,7 +7,7 @@ import challengemvvm.fundingcircle.com.fcchallengemvvm.feature.viewmodel.Auction
 import challengemvvm.fundingcircle.com.fcchallengemvvm.schedulers.ISchedulerProvider
 import challengemvvm.fundingcircle.com.fcchallengemvvm.schedulers.SchedulerProvider
 
-class Application : Application() {
+open class Application : Application() {
 
     val dataModel: AuctionsListRepositoryInterface = AuctionsListRepository()
 
